@@ -1,0 +1,59 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Load the dataset
+url = "https://github.com/Vaishnavi-1912/Credit_prediction/blob/main/credit_customers%20(1).csv"
+data = pd.read_csv(url)
+
+# Drop rows with missing values
+data.dropna(inplace=True)
+
+# Drop duplicates
+data.drop_duplicates(inplace=True)
+
+# Identify categorical columns
+categorical_columns = data.select_dtypes(include=['object']).columns.tolist()
+
+# Label Encoding for categorical columns
+label_encoder = LabelEncoder()
+for col in categorical_columns:
+    data[col] = label_encoder.fit_transform(data[col])
+    
+#data['class'] = data['class'].map({'good': 1, 'bad': 0})
+
+# Separate features (X) and target (y)
+X = data.drop('class', axis=1)
+y = data('class')
+
+# Split Data into Training and Test Sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize models
+models = {
+    "Logistic Regression": LogisticRegression(),
+    "KNN": KNeighborsClassifier(),
+    "SVM Linear": SVC(kernel='linear'),
+    "SVM RBF": SVC(kernel='rbf'),
+    "Random Forest": RandomForestClassifier(random_state=42)
+}
+
+for model_name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"{model_name} Accuracy: {accuracy}")
+    
+    print(f"Confusion Matrix for {model_name}:")
+    print(confusion_matrix(y_test, y_pred))
+    
+    print(f"Classification Report for {model_name}:")
+    print(classification_report(y_test, y_pred))
+
+
